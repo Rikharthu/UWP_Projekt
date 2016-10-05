@@ -20,7 +20,7 @@
                  HorizontalAlignment="Left"
                  Margin="221,51,0,0"
                  TextWrapping="Wrap"
-                 Text="TextBox"
+                 Text=""
                  VerticalAlignment="Top" />
         <TextBox x:Name="Y1TextBox"
                  HorizontalAlignment="Left"
@@ -55,7 +55,7 @@
             <TextBlock x:Name="textBlock"
                        HorizontalAlignment="Left"
                        TextWrapping="Wrap"
-                       Text="TextBlock"
+                       Text=""
                        VerticalAlignment="Top" />
         </ScrollViewer>
         <ProgressBar x:Name="progressBar"

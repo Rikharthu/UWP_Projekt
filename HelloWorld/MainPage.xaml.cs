@@ -26,8 +26,21 @@ namespace HelloWorld
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
+   
     public sealed partial class MainPage : Page
     {
+
+        private bool isTitle = false;
+        private bool isDescription = false;
+        private bool isLink = false;
+        private bool isPubDate = false;
+        private bool isCategory = false;
+        private bool isTopTitle = true;
+        private bool isImageTitle = true;
+        private bool isItem = false;
+        private bool isChannel = false;
+        private FeedItem feedItem;
+        private RSSFeed rssFeed;
 
         public MainPage()
         {
@@ -76,47 +89,107 @@ namespace HelloWorld
                 ws.Indent = true;
                 using (XmlWriter writer = XmlWriter.Create(output, ws))
                 {
-
                     // Parse the file and display each of the nodes.
                     while (reader.Read())
                     {
                         switch (reader.NodeType)
                         {
-                            case XmlNodeType.Element:
+                            
+                           case XmlNodeType.Element:
+                                
+                                switch (reader.Name)
+                                {
+                                    case "title":
+                                        isTitle = true;
+                                        break;
+                                    case "link":
+                                        isLink = true;
+                                        break;
+                                    case "category":
+                                        isCategory = true;
+                                        break;
+                                    case "description":
+                                        isDescription = true;
+                                        break;
+                                    case "pubDate":
+                                        isPubDate = true;
+                                        break;
+                                    case "item":
+                                        isItem = true;
+                                        feedItem=new FeedItem();
+                                        break;
+                                    case "channel":
+                                        isChannel = true;
+                                        rssFeed = new RSSFeed();
+                                        break;
+                                }
+                                break;
+                            case XmlNodeType.CDATA: // because some attributes are CDATA
+                            case XmlNodeType.Text:
+                                // now parse text
+                                if (isChannel)
+                                {
+                                    isChannel = false;
+                                    // set feed properties
+                                }
+                                else if (isItem)
+                                {
+                                    if (isTitle)
+                                    {
+                                        isTitle = false;
+                                        feedItem.Title = reader.Value;
+                                    }
+                                    else if (isCategory)
+                                    {
+                                        isCategory = false;
+                                        feedItem.Category = reader.Value;
+                                    }
+                                    else if (isDescription)
+                                    {
+                                        isDescription = false;
+                                        feedItem.Description = reader.Value;
+                                    }
+                                    else if (isLink)
+                                    {
+                                        isLink = false;
+                                        feedItem.Link = reader.Value;
+                                    }
+                                    else if (isPubDate)
+                                    {
+                                        // TODO в первый раз не сэтит
+                                        isPubDate = false;
+                                        feedItem.PubDate = reader.Value;
+                                    }
+                                }
+                                break;
+                            case XmlNodeType.EndElement:
                                 if (reader.Name == "item")
                                 {
-                                    
+                                    // finish item and add to list
+                                    // persist feedItem
+                                    //textBlock.Text += feedItem.ToString()+"\n\n";
+                                    isItem = false;
+                                    rssFeed.Items.Add(feedItem);
                                 }
-                                textBlock.Text = reader.Name;
-                                writer.WriteStartElement(reader.Name);
-                                break;
-                            case XmlNodeType.Text:
-                                //textBlock.Text = reader.Value;
-                                writer.WriteString(reader.Value);
                                 break;
                             case XmlNodeType.XmlDeclaration:
                             case XmlNodeType.ProcessingInstruction:
                                 writer.WriteProcessingInstruction(reader.Name, reader.Value);
                                 break;
                             case XmlNodeType.Comment:
-                                writer.WriteComment(reader.Value);
-                                break;
-                            case XmlNodeType.EndElement:
-                                if (reader.Name == "item")
-                                {
-                                    // finish item and add to list
-                                }
-                                writer.WriteFullEndElement();
-                                break;
+                               break;
                         }
-                    }
 
+                        
+                    }
+                    foreach (var rssFeedItem in rssFeed.Items)
+                    {
+                        textBlock.Text += rssFeedItem.ToString() + "\n\n";
+                    }
                 }
             }
-            //textBlock.Text = output.ToString();
-
-            FeedItem item = new FeedItem();
-            item.Title = "sadas";
+            //textBlock.Text = feedItem.ToString();
+            
         }
 
        

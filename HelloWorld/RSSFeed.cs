@@ -16,5 +16,10 @@ namespace HelloWorld
 
         public List<FeedItem> Items { get; set; }
 
+        public RSSFeed()
+        {
+            Items = new List<FeedItem>();
+        }
+
     }
 }

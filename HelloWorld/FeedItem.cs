@@ -13,6 +13,15 @@ namespace HelloWorld
         public string Link { get; set; }
         public string Description { get; set; }
         // TODO parse to normal date and get return according to locale
-        public string pubDate { get; set; }
+        public string PubDate { get; set; }
+        public string Category { get; set; }
+
+        public virtual string ToString()
+        {
+            string str = "Title: " + Title + "\nDescription: " + Description
+                         + "\nLink: " + Link + "\nPubDate: " + PubDate
+                         +"\nCategory: "+Category;
+            return str;
+        }
     }
 }
