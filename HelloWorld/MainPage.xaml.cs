@@ -116,6 +116,7 @@ namespace HelloWorld
                                         break;
                                     case "item":
                                         isItem = true;
+                                        isChannel = false;
                                         feedItem=new FeedItem();
                                         break;
                                     case "channel":
@@ -126,11 +127,21 @@ namespace HelloWorld
                                 break;
                             case XmlNodeType.CDATA: // because some attributes are CDATA
                             case XmlNodeType.Text:
+                                // Типа имитируем работу SAX парсера в андроиде
                                 // now parse text
                                 if (isChannel)
                                 {
-                                    isChannel = false;
-                                    // set feed properties
+                                   // set feed properties
+                                    if (isTitle)
+                                    {
+                                        isTitle = false;
+                                        rssFeed.Title = reader.Value;
+                                    }
+                                    else if (isDescription)
+                                    {
+                                        isDescription = false;
+                                        rssFeed.Description = reader.Value;
+                                    }
                                 }
                                 else if (isItem)
                                 {
@@ -166,10 +177,13 @@ namespace HelloWorld
                                 if (reader.Name == "item")
                                 {
                                     // finish item and add to list
-                                    // persist feedItem
                                     //textBlock.Text += feedItem.ToString()+"\n\n";
                                     isItem = false;
                                     rssFeed.Items.Add(feedItem);
+                                }else if (reader.Name == "channel")
+                                {
+                                    //isChannel = false;
+                                    // finished
                                 }
                                 break;
                             case XmlNodeType.XmlDeclaration:
@@ -182,10 +196,14 @@ namespace HelloWorld
 
                         
                     }
+                    String data="";
                     foreach (var rssFeedItem in rssFeed.Items)
                     {
-                        textBlock.Text += rssFeedItem.ToString() + "\n\n";
+                        // TODO сделать всем метод ToHtmlString() для WebView
+                        //textBlock.Text += rssFeedItem.ToString() + "\n\n";
+                        data += rssFeedItem.ToString()+"<hr/>";
                     }
+                    MyWebView.NavigateToString(data);
                 }
             }
             //textBlock.Text = feedItem.ToString();

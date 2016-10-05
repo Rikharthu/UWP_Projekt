@@ -59,11 +59,17 @@
                        VerticalAlignment="Top" />
         </ScrollViewer>
         <ProgressBar x:Name="progressBar"
-            HorizontalAlignment="Left"
+                     HorizontalAlignment="Left"
                      Height="10"
                      Margin="222,246,0,0"
                      VerticalAlignment="Top"
                      Width="100" />
+        <WebView x:Name="MyWebView"
+                 HorizontalAlignment="Left"
+                 Height="424"
+                 Margin="488,79,0,0"
+                 VerticalAlignment="Top"
+                 Width="703" />
 
     </Grid>
 </Page>
