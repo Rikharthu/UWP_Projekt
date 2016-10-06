@@ -76,144 +76,169 @@ namespace HelloWorld
         private async void button1_Click(object sender, RoutedEventArgs e)
         {
             bool isInternetConnected = NetworkInterface.GetIsNetworkAvailable();
-            textBlock.Text = isInternetConnected + "";
 
-            HttpClient client = new HttpClient();
-            var response = await client.GetStreamAsync("http://rus.delfi.lv/rss.php");
-            XDocument xmlDoc = XDocument.Load(response);
-
-            StringBuilder output = new StringBuilder();
-
-            String xmlString =xmlDoc.Document.ToString();
-            progressBar.Value = 50;
-            
-            // Create an XmlReader
-            using (XmlReader reader = XmlReader.Create(new StringReader(xmlString)))
+            if (isInternetConnected)
             {
-                XmlWriterSettings ws = new XmlWriterSettings();
-                ws.Indent = true;
-                using (XmlWriter writer = XmlWriter.Create(output, ws))
-                {
-                    // Parse the file and display each of the nodes.
-                    while (reader.Read())
-                    {
-                        switch (reader.NodeType)
-                        {
-                            
-                           case XmlNodeType.Element:
-                                
-                                switch (reader.Name)
-                                {
-                                    case "title":
-                                        isTitle = true;
-                                        break;
-                                    case "link":
-                                        isLink = true;
-                                        break;
-                                    case "category":
-                                        isCategory = true;
-                                        break;
-                                    case "description":
-                                        isDescription = true;
-                                        break;
-                                    case "pubDate":
-                                        isPubDate = true;
-                                        break;
-                                    case "item":
-                                        isItem = true;
-                                        isChannel = false;
-                                        feedItem=new FeedItem();
-                                        break;
-                                    case "channel":
-                                        isChannel = true;
-                                        rssFeed = new RSSFeed();
-                                        break;
-                                }
-                                break;
-                            case XmlNodeType.CDATA: // because some attributes are CDATA
-                            case XmlNodeType.Text:
-                                // Типа имитируем работу SAX парсера в андроиде
-                                // now parse text
-                                if (isChannel)
-                                {
-                                   // set feed properties
-                                    if (isTitle)
-                                    {
-                                        isTitle = false;
-                                        rssFeed.Title = reader.Value;
-                                    }
-                                    else if (isDescription)
-                                    {
-                                        isDescription = false;
-                                        rssFeed.Description = reader.Value;
-                                    }
-                                }
-                                else if (isItem)
-                                {
-                                    if (isTitle)
-                                    {
-                                        isTitle = false;
-                                        feedItem.Title = reader.Value;
-                                    }
-                                    else if (isCategory)
-                                    {
-                                        isCategory = false;
-                                        feedItem.Category = reader.Value;
-                                    }
-                                    else if (isDescription)
-                                    {
-                                        isDescription = false;
-                                        feedItem.Description = reader.Value;
-                                    }
-                                    else if (isLink)
-                                    {
-                                        isLink = false;
-                                        feedItem.Link = reader.Value;
-                                    }
-                                    else if (isPubDate)
-                                    {
-                                        // TODO в первый раз не сэтит
-                                        isPubDate = false;
-                                        feedItem.PubDate = reader.Value;
-                                    }
-                                }
-                                break;
-                            case XmlNodeType.EndElement:
-                                if (reader.Name == "item")
-                                {
-                                    // finish item and add to list
-                                    //textBlock.Text += feedItem.ToString()+"\n\n";
-                                    isItem = false;
-                                    rssFeed.Items.Add(feedItem);
-                                }else if (reader.Name == "channel")
-                                {
-                                    //isChannel = false;
-                                    // finished
-                                }
-                                break;
-                            case XmlNodeType.XmlDeclaration:
-                            case XmlNodeType.ProcessingInstruction:
-                                writer.WriteProcessingInstruction(reader.Name, reader.Value);
-                                break;
-                            case XmlNodeType.Comment:
-                               break;
-                        }
 
-                        
-                    }
-                    String data="";
-                    foreach (var rssFeedItem in rssFeed.Items)
+                HttpClient client = new HttpClient();
+                var response = await client.GetStreamAsync("http://rus.delfi.lv/rss.php");
+                XDocument xmlDoc = XDocument.Load(response);
+
+                StringBuilder output = new StringBuilder();
+
+                String xmlString = xmlDoc.Document.ToString();
+                progressBar.Value = 50;
+
+                // Create an XmlReader
+                using (XmlReader reader = XmlReader.Create(new StringReader(xmlString)))
+                {
+                    XmlWriterSettings ws = new XmlWriterSettings();
+                    ws.Indent = true;
+                    using (XmlWriter writer = XmlWriter.Create(output, ws))
                     {
-                        // TODO сделать всем метод ToHtmlString() для WebView
-                        //textBlock.Text += rssFeedItem.ToString() + "\n\n";
-                        data += rssFeedItem.ToString()+"<hr/>";
+                        // Parse the file and display each of the nodes.
+                        while (reader.Read())
+                        {
+                            switch (reader.NodeType)
+                            {
+
+                                case XmlNodeType.Element:
+
+                                    switch (reader.Name)
+                                    {
+                                        case "title":
+                                            isTitle = true;
+                                            break;
+                                        case "link":
+                                            isLink = true;
+                                            break;
+                                        case "category":
+                                            isCategory = true;
+                                            break;
+                                        case "description":
+                                            isDescription = true;
+                                            break;
+                                        case "pubDate":
+                                            isPubDate = true;
+                                            break;
+                                        case "item":
+                                            isItem = true;
+                                            isChannel = false;
+                                            feedItem = new FeedItem();
+                                            break;
+                                        case "channel":
+                                            isChannel = true;
+                                            rssFeed = new RSSFeed();
+                                            break;
+                                    }
+                                    break;
+                                case XmlNodeType.CDATA: // because some attributes are CDATA
+                                case XmlNodeType.Text:
+                                    // Типа имитируем работу SAX парсера в андроиде
+                                    // now parse text
+                                    if (isChannel)
+                                    {
+                                        // set feed properties
+                                        if (isTitle)
+                                        {
+                                            isTitle = false;
+                                            rssFeed.Title = reader.Value;
+                                        }
+                                        else if (isDescription)
+                                        {
+                                            isDescription = false;
+                                            rssFeed.Description = reader.Value;
+                                        }
+                                    }
+                                    else if (isItem)
+                                    {
+                                        if (isTitle)
+                                        {
+                                            isTitle = false;
+                                            feedItem.Title = reader.Value;
+                                        }
+                                        else if (isCategory)
+                                        {
+                                            isCategory = false;
+                                            feedItem.Category = reader.Value;
+                                        }
+                                        else if (isDescription)
+                                        {
+                                            isDescription = false;
+                                            feedItem.Description = reader.Value;
+                                        }
+                                        else if (isLink)
+                                        {
+                                            isLink = false;
+                                            feedItem.Link = reader.Value;
+                                        }
+                                        else if (isPubDate)
+                                        {
+                                            // TODO в первый раз не сэтит
+                                            isPubDate = false;
+                                            feedItem.PubDate = reader.Value;
+                                        }
+                                    }
+                                    break;
+                                case XmlNodeType.EndElement:
+                                    if (reader.Name == "item")
+                                    {
+                                        // finish item and add to list
+                                        //textBlock.Text += feedItem.ToString()+"\n\n";
+                                        isItem = false;
+                                        rssFeed.Items.Add(feedItem);
+                                    }
+                                    else if (reader.Name == "channel")
+                                    {
+                                        //isChannel = false;
+                                        // finished
+                                    }
+                                    break;
+                                case XmlNodeType.XmlDeclaration:
+                                case XmlNodeType.ProcessingInstruction:
+                                    writer.WriteProcessingInstruction(reader.Name, reader.Value);
+                                    break;
+                                case XmlNodeType.Comment:
+                                    break;
+                            }
+
+
+                        }
+                        String data = "";
+                        foreach (var rssFeedItem in rssFeed.Items)
+                        {
+                            // TODO сделать всем метод ToHtmlString() для WebView
+                            //textBlock.Text += rssFeedItem.ToString() + "\n\n";
+                            data += rssFeedItem.ToString() + "<hr/>";
+                        }
+                        MyWebView.NavigateToString(data);
                     }
-                    MyWebView.NavigateToString(data);
                 }
+                //textBlock.Text = feedItem.ToString();
+                ShowToastNotification("Finished!", "Finished loading and parsing RSS content!");
             }
-            //textBlock.Text = feedItem.ToString();
-            ShowToastNotification("Finished!","Finished loading and parsing RSS content!");
-            
+            //else
+            {
+                // no internet
+                // show dialog
+                var dialog = new Windows.UI.Popups.MessageDialog(
+                "Please check your connection.",
+                "No internet connection!");
+
+                dialog.Commands.Add(new Windows.UI.Popups.UICommand("Ok") { Id = 0 });
+                //dialog.Commands.Add(new Windows.UI.Popups.UICommand("No") { Id = 1 });
+
+                //if (Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily != "Windows.Mobile")
+                //{
+                //    // Adding a 3rd command will crash the app when running on Mobile !!!
+                //    dialog.Commands.Add(new Windows.UI.Popups.UICommand("Maybe later") { Id = 2 });
+                //}
+
+                dialog.DefaultCommandIndex = 0;
+                //dialog.CancelCommandIndex = 1;
+
+                var result = await dialog.ShowAsync();
+            }
         }
 
         private void ShowToastNotification(string title, string stringContent)
