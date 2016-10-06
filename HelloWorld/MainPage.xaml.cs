@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Xml;
@@ -10,6 +11,7 @@ using System.Xml.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using Windows.UI.Notifications;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -73,6 +75,9 @@ namespace HelloWorld
 
         private async void button1_Click(object sender, RoutedEventArgs e)
         {
+            bool isInternetConnected = NetworkInterface.GetIsNetworkAvailable();
+            textBlock.Text = isInternetConnected + "";
+
             HttpClient client = new HttpClient();
             var response = await client.GetStreamAsync("http://rus.delfi.lv/rss.php");
             XDocument xmlDoc = XDocument.Load(response);
@@ -207,9 +212,26 @@ namespace HelloWorld
                 }
             }
             //textBlock.Text = feedItem.ToString();
+            ShowToastNotification("Finished!","Finished loading and parsing RSS content!");
             
         }
 
-       
+        private void ShowToastNotification(string title, string stringContent)
+        {
+            ToastNotifier ToastNotifier = ToastNotificationManager.CreateToastNotifier();
+            Windows.Data.Xml.Dom.XmlDocument toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
+            Windows.Data.Xml.Dom.XmlNodeList toastNodeList = toastXml.GetElementsByTagName("text");
+            toastNodeList.Item(0).AppendChild(toastXml.CreateTextNode(title));
+            toastNodeList.Item(1).AppendChild(toastXml.CreateTextNode(stringContent));
+            Windows.Data.Xml.Dom.IXmlNode toastNode = toastXml.SelectSingleNode("/toast");
+            Windows.Data.Xml.Dom.XmlElement audio = toastXml.CreateElement("audio");
+            audio.SetAttribute("src", "ms-winsoundevent:Notification.SMS");
+
+            ToastNotification toast = new ToastNotification(toastXml);
+            toast.ExpirationTime = DateTime.Now.AddSeconds(4);
+            ToastNotifier.Show(toast);
+        }
+
+
     }
 }
