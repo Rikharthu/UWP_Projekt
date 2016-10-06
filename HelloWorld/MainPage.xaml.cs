@@ -225,8 +225,11 @@ namespace HelloWorld
                 "Please check your connection.",
                 "No internet connection!");
 
-                dialog.Commands.Add(new Windows.UI.Popups.UICommand("Ok") { Id = 0 });
-                //dialog.Commands.Add(new Windows.UI.Popups.UICommand("No") { Id = 1 });
+                var okCommand = new Windows.UI.Popups.UICommand("Ok") {Id = 0};
+                var retryCommand = new Windows.UI.Popups.UICommand("Retry") {Id = 1};
+
+                dialog.Commands.Add(okCommand);
+                dialog.Commands.Add(retryCommand);
 
                 //if (Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily != "Windows.Mobile")
                 //{
@@ -234,10 +237,14 @@ namespace HelloWorld
                 //    dialog.Commands.Add(new Windows.UI.Popups.UICommand("Maybe later") { Id = 2 });
                 //}
 
-                dialog.DefaultCommandIndex = 0;
-                //dialog.CancelCommandIndex = 1;
+                dialog.DefaultCommandIndex = 1;
+                dialog.CancelCommandIndex = 0;
 
                 var result = await dialog.ShowAsync();
+                if (result == retryCommand)
+                {
+                    // retry
+                }
             }
         }
 
